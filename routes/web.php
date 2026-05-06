@@ -10,6 +10,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\SearchController;
 use App\Models\HomeSection;
 use App\Models\Order;
 use App\Models\Product;
@@ -104,6 +105,11 @@ Route::middleware(['auth'])->prefix('new-login')->group(function () {
     Route::put('/menu-manage/{menu}', [MenuController::class, 'update'])->name('admin.menu.update');
     Route::delete('/menu-manage/{menu}', [MenuController::class, 'destroy'])->name('admin.menu.destroy');
 });
+
+// ========== SEARCH ==========
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+Route::get('/api/search', [SearchController::class, 'search'])->name('search');
 
 // Customer Auth Routes
 Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('login');
