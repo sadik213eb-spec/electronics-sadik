@@ -26,37 +26,44 @@ class CheckoutController extends Controller
 
         $lastNumber = $lastOrder ? intval(substr($lastOrder->order_number, 2)) : 10000;
 
-        return 'SA'.($lastNumber + 1);
+        return 'SA' . ($lastNumber + 1);
     }
 
     public function index()
-    {
-        $identifier = $this->getIdentifier();
+{
+    $identifier = $this->getIdentifier();
 
-        $items = Cart::where($identifier)
-            ->with('product')
-            ->get();
+    $items = Cart::where($identifier)
+        ->with('product')
+        ->get();
 
-        if ($items->isEmpty()) {
-            return redirect('/cart')->with('error', 'Your cart is empty!');
-        }
-
-        $subtotal = $items->sum(function ($item) {
-            return ($item->product->sale_price ?? $item->product->price) * $item->quantity;
-        });
-
-        // ✅ Load saved addresses if customer is logged in
-        $savedAddresses = collect();
-        $defaultAddress = null;
-
-        if (auth('customer')->check()) {
-            $savedAddresses = auth('customer')->user()->addresses()->get();
-            $defaultAddress = $savedAddresses->where('is_default', 1)->first()
-                ?? $savedAddresses->first();
-        }
-
-        return view('checkout', compact('items', 'subtotal', 'savedAddresses', 'defaultAddress'));
+    if ($items->isEmpty()) {
+        return redirect('/cart')->with('error', 'Your cart is empty!');
     }
+
+    $subtotal = $items->sum(function ($item) {
+        return ($item->product->sale_price ?? $item->product->price) * $item->quantity;
+    });
+
+    //  Get coupon from session
+    $coupon   = session('coupon');
+    $discount = $coupon['discount'] ?? 0;
+
+    //  Load saved addresses if customer is logged in
+    $savedAddresses = collect();
+    $defaultAddress = null;
+
+    if (auth('customer')->check()) {
+        $savedAddresses = auth('customer')->user()->addresses()->get();
+        $defaultAddress = $savedAddresses->where('is_default', 1)->first()
+            ?? $savedAddresses->first();
+    }
+
+    return view('checkout', compact(
+        'items', 'subtotal', 'savedAddresses',
+        'defaultAddress', 'coupon', 'discount'
+    ));
+}
 
     public function store(Request $request)
     {
@@ -76,7 +83,8 @@ class CheckoutController extends Controller
             return redirect('/cart')->with('error', 'Your cart is empty!');
         }
 
-        $subtotal = $items->sum(fn ($item) => ($item->product->sale_price ?? $item->product->price) * $item->quantity
+        $subtotal = $items->sum(
+            fn($item) => ($item->product->sale_price ?? $item->product->price) * $item->quantity
         );
 
         // Shipping cost — max from all products
@@ -89,6 +97,10 @@ class CheckoutController extends Controller
         }
 
         $grandTotal = $subtotal + $shippingCost;
+
+        // Get coupon discount from session
+        $discount = session('coupon.discount', 0);
+        $grandTotal = $subtotal + $shippingCost - $discount;
 
         $order = Order::create([
             'order_number' => $this->generateOrderNumber(),
@@ -105,9 +117,12 @@ class CheckoutController extends Controller
             'order_status' => 'processing',
             'total_amount' => $subtotal,
             'shipping_cost' => $shippingCost,
-            'discount_amount' => 0,
+            'discount_amount' => $discount,
             'grand_total' => $grandTotal,
         ]);
+
+        // ✅ Clear coupon after order placed
+        session()->forget('coupon');
 
         foreach ($items as $item) {
             $price = $item->product->sale_price ?? $item->product->price;
@@ -123,6 +138,6 @@ class CheckoutController extends Controller
 
         Cart::where($identifier)->delete();
 
-        return redirect('/order-success/'.$order->id);
+        return redirect('/order-success/' . $order->id);
     }
 }

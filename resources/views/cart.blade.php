@@ -434,8 +434,8 @@
                         {{-- Quantity --}}
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="updateQty({{ $item->id }}, -1)">−</button>
-                            <input type="number" class="qty-input" id="qty-{{ $item->id }}"
-                                value="{{ $item->quantity }}" min="1" readonly>
+                            <input type="number" class="qty-input" id="qty-{{ $item->id }}" value="{{ $item->quantity }}" min="1"
+                                readonly>
                             <button class="qty-btn" onclick="updateQty({{ $item->id }}, 1)">+</button>
                         </div>
 
@@ -504,6 +504,7 @@
 
     <script>
         const csrfToken = '{{ csrf_token() }}';
+        let appliedDiscount = 0;
 
         function updateQty(id, change) {
             const input = document.getElementById('qty-' + id);
@@ -511,15 +512,15 @@
             input.value = newQty;
 
             fetch(`/cart/update/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        quantity: newQty
-                    })
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    quantity: newQty
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -531,30 +532,20 @@
         }
 
         function removeItem(id) {
-            // Confirmation line removed for instant deletion
-
             fetch(`/cart/remove/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                })
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        // Remove the element from the HTML immediately
                         const element = document.getElementById('cart-item-' + id);
-                        if (element) {
-                            element.remove();
-                        }
-
+                        if (element) element.remove();
                         updateCartCount(data.count);
                         recalcTotal();
-
-                        // Reload if cart is empty to show the "Empty Cart" message
-                        if (data.count === 0) {
-                            location.reload();
-                        }
+                        if (data.count === 0) location.reload();
                     }
                 })
                 .catch(err => console.error('Error removing item:', err));
@@ -567,20 +558,50 @@
                 total += parseFloat(val) || 0;
             });
             document.getElementById('total-subtotal').textContent = '৳' + total.toLocaleString('en-IN');
-            document.getElementById('grand-total').textContent = '৳' + total.toLocaleString('en-IN');
+
+            // ✅ Subtract discount
+            const grandTotal = Math.max(0, total - appliedDiscount);
+            document.getElementById('grand-total').textContent = '৳' + grandTotal.toLocaleString('en-IN');
         }
 
         function applyDiscount() {
-            const code = document.getElementById('discount_code').value;
+            const code = document.getElementById('discount_code').value.trim();
             const msg = document.getElementById('discount-msg');
+
             if (!code) {
-                msg.textContent = 'Please enter a discount code.';
+                msg.textContent = 'Please enter a coupon code.';
                 msg.style.color = '#dc2626';
                 return;
             }
-            // Placeholder - implement discount logic later
-            msg.textContent = 'Invalid or expired discount code.';
-            msg.style.color = '#dc2626';
+
+            fetch('/cart/coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    coupon_code: code
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        appliedDiscount = parseFloat(data.discount.replace(/,/g, ''));
+                        msg.textContent = data.message;
+                        msg.style.color = '#16a34a';
+                        document.getElementById('discount-value').textContent = '- ৳' + data.discount;
+                        document.getElementById('discount-value').style.color = '#16a34a';
+                        recalcTotal();
+                    } else {
+                        appliedDiscount = 0;
+                        msg.textContent = data.message;
+                        msg.style.color = '#dc2626';
+                        document.getElementById('discount-value').textContent = '৳ 0';
+                        document.getElementById('discount-value').style.color = '';
+                        recalcTotal();
+                    }
+                });
         }
 
         function updateCartCount(count) {

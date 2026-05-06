@@ -485,12 +485,12 @@
                                 <button type="button"
                                     class="address-card {{ $defaultAddress && $defaultAddress->id === $addr->id ? 'active' : '' }}"
                                     onclick="fillAddress(
-                                        this,
-                                        '{{ addslashes($addr->name) }}',
-                                        '{{ addslashes($addr->mobile) }}',
-                                        '{{ addslashes($addr->address) }}',
-                                        '{{ addslashes($addr->city) }}'
-                                    )">
+                                                                        this,
+                                                                        '{{ addslashes($addr->name) }}',
+                                                                        '{{ addslashes($addr->mobile) }}',
+                                                                        '{{ addslashes($addr->address) }}',
+                                                                        '{{ addslashes($addr->city) }}'
+                                                                    )">
                                     <div class="address-card-type">
                                         {{ $typeIcons[$addr->type] ?? '📍' }} {{ ucfirst($addr->type) }}
                                     </div>
@@ -500,8 +500,7 @@
                             @endforeach
 
                             {{-- Option to use a different address --}}
-                            <button type="button" class="address-card" onclick="clearAddress(this)"
-                                style="border-style: dashed;">
+                            <button type="button" class="address-card" onclick="clearAddress(this)" style="border-style: dashed;">
                                 <div class="address-card-type">➕ New</div>
                                 <div class="address-card-name">Different</div>
                                 <div class="address-card-city">address</div>
@@ -652,8 +651,18 @@
             </div>
 
             <div class="summary-row">
-                <span class="label">Discount:</span>
-                <span class="value" id="checkout-discount">৳ 0</span>
+                <span class="label">
+                    Discount:
+                    @if($coupon)
+                        <span
+                            style="font-size:0.75rem; background:#dcfce7; color:#16a34a; padding:2px 8px; border-radius:50px; margin-left:4px;">
+                            {{ $coupon['code'] }}
+                        </span>
+                    @endif
+                </span>
+                <span class="value" id="checkout-discount" style="{{ $discount > 0 ? 'color:#16a34a;' : '' }}">
+                    {{ $discount > 0 ? '- ৳' . number_format($discount) : '৳ 0' }}
+                </span>
             </div>
 
             <div class="summary-row">
@@ -680,18 +689,18 @@
 
     <script>
         const subtotal = {{ $subtotal }};
+        const discount = {{ $discount ?? 0 }};
         const shippingPrices = {
             inside_dhaka: {{ $items->max(fn($i) => $i->product->shipping_inside_dhaka ?? 60) }},
             outside_dhaka: {{ $items->max(fn($i) => $i->product->shipping_outside_dhaka ?? 120) }}
-        };
+         };
         let currentShipping = shippingPrices.inside_dhaka;
 
         // Init shipping display
         document.getElementById('price-inside').textContent = '৳' + shippingPrices.inside_dhaka;
         document.getElementById('price-outside').textContent = '৳' + shippingPrices.outside_dhaka;
         document.getElementById('checkout-shipping').textContent = '৳' + currentShipping.toLocaleString('en-IN');
-        document.getElementById('checkout-total').textContent = '৳' + (subtotal + currentShipping).toLocaleString('en-IN');
-
+        document.getElementById('checkout-total').textContent = '৳' + Math.max(0, subtotal + currentShipping - discount).toLocaleString('en-IN');
         // ✅ Fill shipping fields from saved address card
         function fillAddress(btn, name, phone, address, city) {
             document.getElementById('shipping_name').value = name;
@@ -733,9 +742,9 @@
         }
 
         function updateTotal() {
-            const total = subtotal + currentShipping;
-            document.getElementById('checkout-total').textContent = '৳' + total.toLocaleString('en-IN');
-        }
+    const total = Math.max(0, subtotal + currentShipping - discount);
+    document.getElementById('checkout-total').textContent = '৳' + total.toLocaleString('en-IN');
+}
 
         function applyDiscount() {
             const code = document.getElementById('discount_code').value;

@@ -19,14 +19,6 @@ class CartController extends Controller
         return ['session_id' => session()->getId()];
     }
 
-    // private function getIdentifier()
-    // {
-    //     if (Auth::guard('customer')->check()) {
-    //         return ['user_id' => Auth::guard('customer')->id()];
-    //     }
-
-    //     return ['session_id' => session()->getId()];
-    // }
 
     public function index()
     {
@@ -99,5 +91,86 @@ class CartController extends Controller
     private function getCartCount()
     {
         return Cart::where($this->getIdentifier())->sum('quantity');
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        $code = strtoupper(trim($request->coupon_code));
+
+        if (empty($code)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter a coupon code.',
+            ]);
+        }
+
+        // Find coupon
+        $coupon = \App\Models\Coupon::where('code', $code)->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid coupon code.',
+            ]);
+        }
+
+        // Check if valid (active + date range)
+        if (!$coupon->isValid()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This coupon has expired or is not active.',
+            ]);
+        }
+
+        // Get cart items
+        $items = Cart::where($this->getIdentifier())->with('product')->get();
+
+        if ($items->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your cart is empty.',
+            ]);
+        }
+
+        // Check if coupon applies to any product in cart
+        $applicableSubtotal = 0;
+        foreach ($items as $item) {
+            if ($coupon->appliesToProduct($item->product_id)) {
+                $applicableSubtotal += ($item->product->sale_price ?? $item->product->price) * $item->quantity;
+            }
+        }
+
+        if ($applicableSubtotal <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This coupon is not applicable to any product in your cart.',
+            ]);
+        }
+
+        // Calculate discount
+        $discount = $coupon->calculateDiscount($applicableSubtotal);
+
+        // Save coupon to session
+        session([
+            'coupon' => [
+                'code' => $coupon->code,
+                'discount' => $discount,
+                'type' => $coupon->type,
+                'amount' => $coupon->amount,
+            ]
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon applied successfully!',
+            'discount' => number_format($discount),
+            'code' => $coupon->code,
+        ]);
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget('coupon');
+        return response()->json(['success' => true]);
     }
 }
