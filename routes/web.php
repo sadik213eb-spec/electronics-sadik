@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ContactController;
 use App\Models\HomeSection;
 use App\Models\Order;
 use App\Models\Product;
@@ -38,10 +40,16 @@ Route::get('/', function () {
     return view('home', compact('sliders', 'banners', 'sections'));
 });
 
+// ========== CONTACT ==========
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+Route::get('/contact', function(){
+    return view('contact');
+}) -> name('contact');
+
 // ========== PRODUCT IMAGE (private storage) ==========
 Route::get('/product-image/{filename}', function ($filename) {
-    $path = storage_path('app/private/products/'.$filename);
-    if (! file_exists($path)) {
+    $path = storage_path('app/private/products/' . $filename);
+    if (!file_exists($path)) {
         abort(404);
     }
 
@@ -78,6 +86,9 @@ Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('car
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.coupon');
 Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
+
+// ========== Offer ==========
+Route::get('/offers/{slug}', [OfferController::class, 'show'])->name('offer.show');
 
 // ========== CUSTOM PAGES ==========
 Route::get('/pages/{slug}', [CustomPageController::class, 'show'])->name('pages.show');

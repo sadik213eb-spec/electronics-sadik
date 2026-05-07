@@ -15,7 +15,11 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             background-color: #ededed;
@@ -24,11 +28,20 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3, h4, h5, h6, .section-title, .navbar-brand {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .section-title,
+        .navbar-brand {
             font-family: 'Montserrat', sans-serif;
         }
 
-        a { text-decoration: none; }
+        a {
+            text-decoration: none;
+        }
 
         /* Dropdown styles */
         .dropdown-menu {
@@ -36,7 +49,7 @@
             position: fixed;
             background: #fff;
             border-radius: 0 0 5px 5px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             min-width: 130px;
             z-index: 99999;
             padding: 10px 0;
@@ -57,11 +70,23 @@
             padding-left: 20px;
         }
 
-        #search-results::-webkit-scrollbar { width: 4px; }
-        #search-results::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+        #search-results::-webkit-scrollbar {
+            width: 4px;
+        }
 
-        .nav-scroll::-webkit-scrollbar { display: none; }
-        .nav-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        #search-results::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 4px;
+        }
+
+        .nav-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
@@ -71,11 +96,14 @@
     <nav style="background:#1a1a1a; border-bottom:1px solid #2d2d2d; position:sticky; top:0; z-index:9999;">
 
         <!-- FIRST ROW: Logo + Search + Icons -->
-        <div style="max-width:1440px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; height:65px; gap:20px;">
+        <div
+            style="max-width:1440px; margin:0 auto; padding:0 20px; display:flex; align-items:center; justify-content:space-between; height:65px; gap:20px;">
 
             <!-- Logo -->
-            <a href="/" style="font-size:1.4rem; font-weight:800; color:#f59e0b; text-decoration:none; white-space:nowrap;">
-                <img src="http://127.0.0.1:8000/storage/media/wholesale-electronics-tm-1-768x63png-removebg-preview.png" alt="Wholesale Electronics" width="280">
+            <a href="/"
+                style="font-size:1.4rem; font-weight:800; color:#f59e0b; text-decoration:none; white-space:nowrap;">
+                <img src="http://127.0.0.1:8000/storage/media/wholesale-electronics-tm-1-768x63png-removebg-preview.png"
+                    alt="Wholesale Electronics" width="280">
             </a>
 
             <!-- Search Bar -->
@@ -96,20 +124,24 @@
             <!-- Right Icons -->
             <div style="display:flex; align-items:center; gap:20px;">
                 <!-- Cart -->
-                <a href="/cart" style="position:relative; text-decoration:none; display:flex; flex-direction:column; align-items:center;">
+                <a href="/cart"
+                    style="position:relative; text-decoration:none; display:flex; flex-direction:column; align-items:center;">
                     <i class="fas fa-shopping-cart" style="font-size:1.3rem; color:#d1d5db;"></i>
-                    <span id="cart-count" style="position:absolute; top:-8px; right:-8px; background:#dc2626; color:#fff; border-radius:50%; width:18px; height:18px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">0</span>
+                    <span id="cart-count"
+                        style="position:absolute; top:-8px; right:-8px; background:#dc2626; color:#fff; border-radius:50%; width:18px; height:18px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">0</span>
                     <span style="color:#9ca3af; font-size:0.72rem; margin-top:2px;">Cart</span>
                 </a>
 
                 <!-- Account -->
                 @auth('customer')
-                    <a href="/account" style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
+                    <a href="/account"
+                        style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
                         <i class="fas fa-user" style="font-size:1.3rem; color:#d1d5db;"></i>
                         <span style="color:#9ca3af; font-size:0.72rem; margin-top:2px;">Account</span>
                     </a>
                 @else
-                    <a href="/login" style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
+                    <a href="/login"
+                        style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
                         <i class="fas fa-user" style="font-size:1.3rem; color:#d1d5db;"></i>
                         <span style="color:#9ca3af; font-size:0.72rem; margin-top:2px;">Login</span>
                     </a>
@@ -119,7 +151,8 @@
 
         <!-- SECOND ROW: Dynamic Nav Menu -->
         <div style="background:#222222; border-top:1px solid #333;">
-            <div class="nav-scroll" style="max-width:1440px; margin:0 auto; padding:0 20px; display:flex; align-items:center;">
+            <div class="nav-scroll"
+                style="max-width:1440px; margin:0 auto; padding:0 20px; display:flex; align-items:center;">
                 @foreach ($topMenus as $menu)
                     <div class="nav-item" data-id="{{ $menu->id }}">
                         <a href="{{ $menu->url }}" class="nav-link"
@@ -153,45 +186,92 @@
     <footer style="background:#1a1a1a; border-top:1px solid #2d2d2d; margin-top:60px; padding:40px 20px;">
         <div style="max-width:1440px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:32px;">
 
+            {{-- Column 1: Static --}}
             <div>
-                <p style="color:#f59e0b; font-size:1.2rem; font-weight:700; margin-bottom:12px;">⚡ Wholesale Electronics</p>
-                <p style="color:#6b7280; font-size:0.85rem; line-height:1.6;">Your trusted online store for authentic electronics & home appliances.</p>
-            </div>
+                {{-- Logo --}}
+                <div style="margin-bottom:16px;">
+                    <img src="http://127.0.0.1:8000/storage/media/wholesale-electronics-tm-1-768x63png-removebg-preview.png"
+                        alt="Wholesale Electronics" width="220">
+                </div>
 
-            <div>
-                <p style="color:#fff; font-weight:600; margin-bottom:12px;">Quick Links</p>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    @foreach ($footerMenus as $menu)
-                        <a href="{{ $menu->url }}" style="color:#6b7280; font-size:0.85rem;"
-                            onmouseover="this.style.color='#f59e0b'"
-                            onmouseout="this.style.color='#6b7280'">
-                            {{ $menu->name }}
-                        </a>
-                    @endforeach
+                {{-- Address --}}
+                <div style="display:flex; gap:10px; margin-bottom:14px; align-items:flex-start;">
+                    <i class="fas fa-map-marker-alt" style="color:#f59e0b; margin-top:3px; flex-shrink:0;"></i>
+                    <p style="color:#f9f9f9; font-size: 1rem; line-height:1.6;"><strong>Head Office (Showroom):</strong>
+                        Plot: 4-5, <br>Section: 07,
+                        Mirpur-11 Bus Stand, <br> Pallabi, Dhaka-1216.</p>
+                </div>
+
+                {{-- Phone --}}
+                <div style="display:flex; gap:10px; margin-bottom:14px; align-items:flex-start;">
+                    <i class="fas fa-phone" style="color:#f59e0b; margin-top:3px; flex-shrink:0;"></i>
+                    <div>
+                        <p style="color:#f9f9f9; font-size: 1rem;">+88 01329701348</p>
+                        <p style="color:#f9f9f9; font-size: 1rem;">+88 09638377777</p>
+                    </div>
+                </div>
+
+                {{-- Email --}}
+                <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center;">
+                    <i class="fas fa-envelope" style="color:#f59e0b; flex-shrink:0;"></i>
+                    <p style="color:#f9f9f9; font-size: 1rem;">info@electronicsbangladesh.com</p>
+                </div>
+
+                {{-- Social Icons --}}
+                <div style="display:flex; gap:10px;">
+                    <a href="#"
+                        style="width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; color:#1a1a1a; font-size:1rem; transition:0.2s;"
+                        onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#fff'">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#"
+                        style="width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; color:#1a1a1a; font-size:1rem; transition:0.2s;"
+                        onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#fff'">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#"
+                        style="width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; color:#1a1a1a; font-size:1rem; transition:0.2s;"
+                        onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#fff'">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#"
+                        style="width:36px; height:36px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; color:#1a1a1a; font-size:1rem; transition:0.2s;"
+                        onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#fff'">
+                        <i class="fab fa-youtube"></i>
+                    </a>
                 </div>
             </div>
 
-            <div>
-                <p style="color:#fff; font-weight:600; margin-bottom:12px;">Policy</p>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <a href="/pages/privacy-policy" style="color:#6b7280; font-size:0.85rem;">Privacy Policy</a>
-                    <a href="/pages/return-policy" style="color:#6b7280; font-size:0.85rem;">Return Policy</a>
-                    <a href="/pages/delivery-policy" style="color:#6b7280; font-size:0.85rem;">Delivery Policy</a>
+            {{-- Columns 2, 3, 4: Dynamic from footer menus (max 3 parents) --}}
+            @foreach ($footerMenus->take(2) as $menu)
+                <div>
+                    <p style="color:#fff; font-weight:600; margin-bottom:12px; font-size: 1.1rem;">{{ $menu->name }}
+                    </p>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        @foreach ($menu->children as $child)
+                            <a href="{{ $child->url }}" style="color:#f9f9f9; font-size: 0.95rem; font-weight: 400;"
+                                onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#f9f9f9'">
+                                {{ $child->name }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
+            @endforeach
+
+            {{-- Column 4: Static Location + Map --}}
+            <div>
+                <p style="color:#fff; font-weight:600; margin-bottom:12px; font-size:1.1rem;">Location</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.054990059938!2d90.36341347589847!3d23.81664353622884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c149b4951f53%3A0xdb68f318656a9b7b!2sWholesale%20Electronics%20City%20(Mirpur%20Branch)!5e0!3m2!1sen!2sbd!4v1778138871680!5m2!1sen!2sbd"
+                width="100%" height="250" style="border:1px solid #dddddd; border-radius: 5px;" allowfullscreen=""
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
 
-            <div>
-                <p style="color:#fff; font-weight:600; margin-bottom:12px;">Contact</p>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <p style="color:#6b7280; font-size:0.85rem;">📞 +880 1234-567890</p>
-                    <p style="color:#6b7280; font-size:0.85rem;">📧 info@wholesale.com</p>
-                    <p style="color:#6b7280; font-size:0.85rem;">📍 Dhaka, Bangladesh</p>
-                </div>
-            </div>
         </div>
 
         <div style="border-top:1px solid #2d2d2d; margin-top:32px; padding-top:20px; text-align:center;">
-            <p style="color:#6b7280; font-size:0.85rem;">© {{ date('Y') }} All rights reserved. Developed by <span style="color:#f59e0b;">Md. Sadik</span></p>
+            <p style="color:#f9f9f9; font-size: 1rem; font-weight: 500;">Copyright © {{ date('Y') }} Wholesale
+                Electronics | All rights reserved. Developed by <span style="color:#f59e0b; font-weight: 900;">Md.
+                    Sadik</span></p>
         </div>
     </footer>
 
@@ -200,7 +280,8 @@
         class="fixed bottom-10 right-10 z-100 bg-white border border-gray-100 shadow-2xl rounded-xl p-4 transition-all duration-500 transform translate-y-20 opacity-0 flex items-center justify-between gap-6 min-w-[380px]">
         <div class="flex items-center gap-4">
             <div class="bg-yellow-100 p-2 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
@@ -209,7 +290,8 @@
                 <p id="toast-msg" class="text-gray-500 text-xs">Product added successfully.</p>
             </div>
         </div>
-        <a href="/cart" class="text-amber-600 font-bold text-sm hover:text-amber-700 transition-colors flex items-center gap-1">
+        <a href="/cart"
+            class="text-amber-600 font-bold text-sm hover:text-amber-700 transition-colors flex items-center gap-1">
             View Cart <span class="text-lg">→</span>
         </a>
     </div>
@@ -327,4 +409,5 @@
     </script>
 
 </body>
+
 </html>
