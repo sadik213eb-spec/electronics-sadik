@@ -30,7 +30,7 @@
 
         .banner-wrap a img {
             width: 100%;
-            height: 219px;
+            height: 199px;
             object-fit: cover;
             border-radius: 12px;
             display: block;
@@ -191,13 +191,13 @@
         .categories-row {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 10px;
+            gap: 7px;
         }
 
         .category-card {
             background: #ffffff;
             border-radius: 10px;
-            padding: 10px 10px;
+            padding: 10px 5px;
             text-align: center;
             border: 1px solid #dddddd;
             cursor: pointer;
@@ -206,6 +206,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
         }
 
         .category-card:hover {
@@ -224,7 +225,7 @@
 
         .category-card p {
             color: #2a2a2a;
-            font-size: 1.1rem;
+            font-size: 0.92rem;
             font-weight: 500;
         }
 
@@ -240,7 +241,7 @@
 
         .image-section a img {
             width: 100%;
-            height: 300px;
+            height: 299%px;
             object-fit: cover;
             border-radius: 12px;
         }
@@ -290,19 +291,19 @@
 
         {{-- SLIDER --}}
         <div class="slider-wrap">
-            <div class="swiper mySwiper" style="border-radius:12px; overflow:hidden; height:450px; width:100%;">
+            <div class="swiper mySwiper" style="border-radius:12px; overflow:hidden; height:410px; width:100%;">
                 <div class="swiper-wrapper">
                     @forelse($sliders as $slider)
                         <div class="swiper-slide">
                             <a href="{{ $slider->link ?? '#' }}">
                                 <img src="{{ asset('storage/' . $slider->image) }}"
-                                    style="width:100%; height:450px; object-fit:cover;">
+                                    style="width:100%; height:410px; object-fit:cover;">
                             </a>
                         </div>
                     @empty
                         <div class="swiper-slide">
                             <div
-                                style="width:100%; height:450px; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
+                                style="width:100%; height:410; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
                                 <p style="color:#6b7280;">No sliders available</p>
                             </div>
                         </div>
@@ -337,7 +338,7 @@
                     @foreach ($section->items as $item)
                         <a href="{{ $item->link ?? '#' }}" style="{{ $itemCount === 1 ? 'display:block;' : 'flex:1;' }}">
                             <img src="{{ asset('storage/' . $item->image) }}" alt="Banner"
-                                style="width:100%; height:{{ $itemCount === 1 ? '160px' : '300px' }}; object-fit:cover; border-radius:12px; {{ $itemCount === 1 ? 'max-width:1260px; display:block; margin:0 auto;' : '' }}">
+                                style="width:100%; height:{{ $itemCount === 1 ? '160px' : '300px' }}; object-fit:cover; border-radius:10px; {{ $itemCount === 1 ? 'max-width:1260px; display:block; margin:0 auto;' : '' }}">
                         </a>
                     @endforeach
                 </div>

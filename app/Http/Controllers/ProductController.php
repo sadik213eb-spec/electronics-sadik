@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductBanner;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Required for the price calculations
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -14,29 +15,31 @@ class ProductController extends Controller
      */
     public function show($slug)
     {
-        // Find the product by slug and ensure it is active
         $product = Product::where('slug', $slug)
             ->where('status', 'active')
             ->with(['category.parent', 'brand'])
             ->firstOrFail();
 
-        // Get related products from the same category
         $related = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('status', 'active')
             ->limit(6)
             ->get();
 
-        // Load approved reviews with average rating
-        $reviews = $product->reviews()
-            ->where('status', 'approved')
-            ->latest()
-            ->get();
-
+        $reviews = $product->reviews()->where('status', 'approved')->latest()->get();
         $averageRating = $reviews->avg('rating');
         $reviewCount = $reviews->count();
 
-        return view('product', compact('product', 'related', 'reviews', 'averageRating', 'reviewCount'));
+        $productBanner = ProductBanner::where('is_active', true)->latest()->first();
+
+        return view('product', compact(
+            'product',
+            'related',
+            'reviews',
+            'averageRating',
+            'reviewCount',
+            'productBanner'
+        ));
     }
 
     /**
@@ -86,7 +89,7 @@ class ProductController extends Controller
         $category = Category::where('slug', $childSlug)->firstOrFail();
 
         // 2. Safety Check: Ensure the child actually belongs to the parent slug provided in URL
-        if (! $category->parent || $category->parent->slug !== $parentSlug) {
+        if (!$category->parent || $category->parent->slug !== $parentSlug) {
             abort(404);
         }
 

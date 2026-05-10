@@ -206,8 +206,8 @@
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <div class="info-text">
-                        <p>Head Office</p>
-                        <span>Matikata Bazar, ECB Chattar, Dhaka Cantonment, Dhaka-1206.</span>
+                        <p>Head Office (Showroom):</p>
+                        <span>Plot: 4-5, Section: 07, Mirpur-11 Bus Stand, Pallabi, Dhaka-1216.</span>
                     </div>
                 </div>
 

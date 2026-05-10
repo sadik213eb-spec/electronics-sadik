@@ -89,6 +89,7 @@ Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('ca
 
 // ========== Offer ==========
 Route::get('/offers/{slug}', [OfferController::class, 'show'])->name('offer.show');
+Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
 
 // ========== CUSTOM PAGES ==========
 Route::get('/pages/{slug}', [CustomPageController::class, 'show'])->name('pages.show');

@@ -93,7 +93,7 @@ class OfferResource extends Resource
                             ->options(function () {
                                 return Product::where('status', 'active')
                                     ->get()
-                                    ->mapWithKeys(fn ($p) => [$p->id => $p->name]);
+                                    ->mapWithKeys(fn($p) => [$p->id => $p->name]);
                             })
                             ->searchable()
                             ->preload()
@@ -110,7 +110,7 @@ class OfferResource extends Resource
                         Select::make('status')
                             ->label('Status')
                             ->options([
-                                'active'   => 'Active',
+                                'active' => 'Active',
                                 'inactive' => 'Inactive',
                             ])
                             ->default('active')
@@ -120,6 +120,10 @@ class OfferResource extends Resource
                         Toggle::make('show_timer')
                             ->label('Show Timer')
                             ->default(false),
+
+                        Toggle::make('show_on_page')
+                            ->label('Show on Offer Page')
+                            ->default('true'),
 
                         DateTimePicker::make('start_date')
                             ->label('Start Date')
@@ -166,16 +170,12 @@ class OfferResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('sort_order')
-                    ->label('Sort')
-                    ->sortable(),
-
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'active'   => 'success',
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
                         'inactive' => 'danger',
-                        default    => 'gray',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('start_date')
@@ -187,12 +187,6 @@ class OfferResource extends Resource
                     ->label('End Date')
                     ->dateTime('d/m/Y h:i A')
                     ->sortable(),
-
-                TextColumn::make('description')
-                    ->label('About')
-                    ->limit(30)
-                    ->toggleable(),
-
             ])
             ->defaultSort('sort_order', 'asc')
             ->filters([])
@@ -215,9 +209,9 @@ class OfferResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListOffers::route('/'),
+            'index' => ListOffers::route('/'),
             'create' => CreateOffer::route('/create'),
-            'edit'   => EditOffer::route('/{record}/edit'),
+            'edit' => EditOffer::route('/{record}/edit'),
         ];
     }
 }

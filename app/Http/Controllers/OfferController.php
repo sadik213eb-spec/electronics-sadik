@@ -33,4 +33,14 @@ class OfferController extends Controller
 
         return view('offer', compact('offer', 'products'));
     }
+
+    public function index(){
+        $offers = Offer::where('status', 'active')
+        ->where('show_on_page', true)
+        ->where('end_date', '>=', now())
+        ->orderBy('sort_order', 'asc')
+        ->get();
+
+        return view('offers', compact('offers'));
+    }
 }

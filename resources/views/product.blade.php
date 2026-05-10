@@ -578,8 +578,23 @@
 
             {{-- Rating --}}
             <div class="product-rating">
-                <span class="stars">★★★★★</span>
-                <span class="rating-count">(0 Reviews)</span>
+                <span class="stars">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= round($averageRating))
+                            <span style="color:#d97706;">★</span>
+                        @else
+                            <span style="color:#dddddd;">★</span>
+                        @endif
+                    @endfor
+                </span>
+                <span class="rating-count">
+                    @if ($reviewCount > 0)
+                        {{ number_format($averageRating, 1) }} ({{ $reviewCount }}
+                        {{ $reviewCount == 1 ? 'Review' : 'Reviews' }})
+                    @else
+                        No Reviews
+                    @endif
+                </span>
             </div>
 
             {{-- Price --}}
@@ -676,6 +691,21 @@
                     <i class="far fa-copy"></i>
                 </button>
             </div>
+
+            {{-- ✅ Product Banner --}}
+            @if ($productBanner && $productBanner->image)
+                <div style="margin-top: 20px;">
+                    @if ($productBanner->link)
+                        <a href="{{ $productBanner->link }}">
+                            <img src="{{ asset('storage/' . $productBanner->image) }}" alt="Banner"
+                                style="width:100%; border-radius:10px; display:block;" />
+                        </a>
+                    @else
+                        <img src="{{ asset('storage/' . $productBanner->image) }}" alt="Banner"
+                            style="width:100%; border-radius:10px; display:block;" />
+                    @endif
+                </div>
+            @endif
         </div>
 
     </div>

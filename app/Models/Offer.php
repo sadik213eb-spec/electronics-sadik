@@ -17,6 +17,7 @@ class Offer extends Model
         'banner',
         'product_ids',
         'show_timer',
+        'show_on_page',
         'status',
         'start_date',
         'end_date',
@@ -25,6 +26,7 @@ class Offer extends Model
     protected $casts = [
         'product_ids' => 'array',
         'show_timer'  => 'boolean',
+        'show_on_page'  => 'boolean',
         'start_date'  => 'datetime',
         'end_date'    => 'datetime',
     ];
