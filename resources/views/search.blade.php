@@ -111,6 +111,7 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: 0.3s;
+            border: none;
         }
 
         .apply-btn:hover {
@@ -218,9 +219,7 @@
             height: 35px;
         }
 
-        .product-name:hover {
-            color: #2a2a2a90;
-        }
+        .product-name:hover { color: #2a2a2a90; }
 
         .action-row {
             display: flex;
@@ -261,6 +260,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            flex-wrap: wrap;
         }
 
         .sale-price {
@@ -317,13 +317,147 @@
             color: #9ca3af;
         }
 
+        /* ── Mobile Filter Bar ── */
+        .mobile-filter-bar {
+            display: none;
+        }
+
+        /* ── Filter Drawer ── */
+        .filter-drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+        }
+
+        .filter-drawer-overlay.open { display: block; }
+
+        .filter-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            z-index: 9999;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .filter-drawer.open { transform: translateY(0); }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #dddddd;
+            border-radius: 50px;
+            margin: 0 auto 16px;
+        }
+
+        .drawer-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2a2a2a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drawer-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #9ca3af;
+            cursor: pointer;
+        }
+
+        /* ── Mobile Responsive ── */
         @media (max-width: 1024px) {
             .main-layout {
                 grid-template-columns: 1fr;
             }
 
             .filter-sidebar {
+                display: none;
                 position: static;
+            }
+
+            .mobile-filter-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .mobile-filter-btn {
+                flex: 1;
+                padding: 10px;
+                background: #2a2a2a;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                font-family: 'Poppins', sans-serif;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .mobile-sort-wrap {
+                flex: 1;
+            }
+
+            .mobile-sort-wrap select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #dddddd;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-family: 'Poppins', sans-serif;
+                outline: none;
+                cursor: pointer;
+                background: #fff;
+            }
+
+            .items-found-bar .flex {
+                display: none;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .product-top-section {
+                height: 160px;
+            }
+
+            .sale-price {
+                font-size: 1rem;
+            }
+
+            .product-name {
+                font-size: 0.78rem;
+            }
+
+            .cart-btn {
+                width: 32px;
+                height: 32px;
+            }
+
+            .cart-btn svg {
+                width: 16px !important;
+                height: 16px !important;
             }
         }
     </style>
@@ -339,29 +473,87 @@
         {{-- MAIN TITLE --}}
         <h1 class="main-title">Search results for "{{ $query }}"</h1>
 
-        {{-- FORM --}}
+        {{-- ── Mobile Filter Bar (outside form) ── --}}
+        <div class="mobile-filter-bar">
+            <button type="button" class="mobile-filter-btn" onclick="openFilterDrawer()">
+                <i class="fas fa-sliders-h"></i> Filter
+            </button>
+            <div class="mobile-sort-wrap">
+                <form method="GET" action="{{ url()->current() }}" id="mobile-sort-form">
+                    <input type="hidden" name="q" value="{{ $query }}">
+                    @foreach(request()->except(['sort','q']) as $key => $val)
+                        @if(is_array($val))
+                            @foreach($val as $v)
+                                <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                        @endif
+                    @endforeach
+                    <select name="sort" onchange="document.getElementById('mobile-sort-form').submit()">
+                        <option value="newest"     {{ request('sort') == 'newest'     ? 'selected' : '' }}>Newest</option>
+                        <option value="price_low"  {{ request('sort') == 'price_low'  ? 'selected' : '' }}>Price: Low to High</option>
+                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        {{-- ── Filter Drawer Overlay (outside form) ── --}}
+        <div class="filter-drawer-overlay" id="drawer-overlay" onclick="closeFilterDrawer()"></div>
+
+        {{-- ── Filter Drawer (outside form) ── --}}
+        <div class="filter-drawer" id="filter-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-title">
+                <i class="fas fa-filter"></i> Filters
+                <button class="drawer-close" onclick="closeFilterDrawer()">✕</button>
+            </div>
+            <form method="GET" action="{{ url()->current() }}">
+                <input type="hidden" name="q" value="{{ $query }}">
+                <div class="filter-group">
+                    <span class="filter-label">Filter by price</span>
+                    <div class="price-inputs">
+                        <input type="number" name="min_price" class="price-input" placeholder="Min" value="{{ request('min_price') }}">
+                        <input type="number" name="max_price" class="price-input" placeholder="Max" value="{{ request('max_price') }}">
+                    </div>
+                    <button type="submit" class="apply-btn">Apply</button>
+                </div>
+                <div class="filter-group" style="border:none">
+                    <span class="filter-label">By Brand</span>
+                    <div class="brand-list">
+                        @foreach ($brands as $brand)
+                            <label class="brand-item">
+                                <input type="checkbox" name="brands[]" value="{{ $brand->id }}"
+                                    {{ in_array($brand->id, request('brands', [])) ? 'checked' : '' }}
+                                    onchange="this.form.submit()">
+                                {{ $brand->name }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- ── Main Form ── --}}
         <form method="GET" action="{{ url()->current() }}">
             <input type="hidden" name="q" value="{{ $query }}">
 
             <div class="main-layout">
 
-                {{-- LEFT SIDEBAR --}}
+                {{-- LEFT SIDEBAR (desktop) --}}
                 <aside class="filter-sidebar">
                     <div class="filter-title">
                         <i class="fas fa-filter"></i> Filters
                     </div>
-
                     <div class="filter-group">
                         <span class="filter-label">Filter by price</span>
                         <div class="price-inputs">
-                            <input type="number" name="min_price" class="price-input" placeholder="Min"
-                                value="{{ request('min_price') }}">
-                            <input type="number" name="max_price" class="price-input" placeholder="Max"
-                                value="{{ request('max_price') }}">
+                            <input type="number" name="min_price" class="price-input" placeholder="Min" value="{{ request('min_price') }}">
+                            <input type="number" name="max_price" class="price-input" placeholder="Max" value="{{ request('max_price') }}">
                         </div>
                         <button type="submit" class="apply-btn">Apply</button>
                     </div>
-
                     <div class="filter-group" style="border:none">
                         <span class="filter-label">By Brand</span>
                         <div class="brand-list">
@@ -388,11 +580,9 @@
                         <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-500">Sort By:</span>
                             <select name="sort" class="sort-dropdown" onchange="this.form.submit()">
-                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
-                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low
-                                    to High</option>
-                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price:
-                                    High to Low</option>
+                                <option value="newest"     {{ request('sort') == 'newest'     ? 'selected' : '' }}>Newest</option>
+                                <option value="price_low"  {{ request('sort') == 'price_low'  ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
                             </select>
                         </div>
                     </div>
@@ -448,27 +638,20 @@
                                         <a href="{{ route('product.show', $product->slug) }}" class="product-name">
                                             {{ $product->name }}
                                         </a>
-
                                         <div class="action-row">
                                             @if ($savings > 0)
                                                 <span class="save-amount-badge">Save ৳{{ number_format($savings) }}</span>
                                             @else
                                                 <div style="width:80px;"></div>
                                             @endif
-
-                                            <button title="Add to Cart" onclick="addToCart(event, {{ $product->id }})"
-                                                class="cart-btn">
-                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M3 3h2l.4 2M7 13h10l3-6H6.4M7 13L5.4 5M7 13l-1.5 3h11M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
+                                            <button title="Add to Cart" onclick="addToCart(event, {{ $product->id }})" class="cart-btn">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:22px; height:22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l3-6H6.4M7 13L5.4 5M7 13l-1.5 3h11M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
                                                 </svg>
                                             </button>
                                         </div>
-
                                         <div class="price-row">
-                                            <span
-                                                class="sale-price">৳{{ number_format($product->sale_price ?? $product->price) }}</span>
+                                            <span class="sale-price">৳{{ number_format($product->sale_price ?? $product->price) }}</span>
                                             @if ($product->sale_price)
                                                 <span class="old-price">৳{{ number_format($product->price) }}</span>
                                             @endif
@@ -486,30 +669,40 @@
                 </div>{{-- end products-column --}}
             </div>{{-- end main-layout --}}
         </form>
-    </div>
+
+    </div>{{-- end category-container --}}
 
     <script>
+        function openFilterDrawer() {
+            document.getElementById('filter-drawer').classList.add('open');
+            document.getElementById('drawer-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFilterDrawer() {
+            document.getElementById('filter-drawer').classList.remove('open');
+            document.getElementById('drawer-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
         function addToCart(event, productId) {
             if (event) event.preventDefault();
             const qty = 1;
             fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: qty
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        updateCartCount(data.count);
-                        showCartPopup(productId, qty);
-                    }
-                });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ product_id: productId, quantity: qty })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount(data.count);
+                    showCartPopup(productId, qty);
+                }
+            });
         }
 
         function updateCartCount(count) {
@@ -532,33 +725,28 @@
 
         function toggleWishlistCard(productId, btn) {
             const isLoggedIn = {{ auth('customer')->check() ? 'true' : 'false' }};
-            if (!isLoggedIn) {
-                window.location.href = '/login';
-                return;
-            }
+            if (!isLoggedIn) { window.location.href = '/login'; return; }
             fetch('/wishlist/toggle', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    const icon = btn.querySelector('i');
-                    if (data.status === 'added') {
-                        icon.className = 'fas fa-heart';
-                        icon.style.color = '#dc2626';
-                        btn.style.borderColor = '#dc2626';
-                    } else {
-                        icon.className = 'far fa-heart';
-                        icon.style.color = '#9ca3af';
-                        btn.style.borderColor = '#dddddd';
-                    }
-                });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const icon = btn.querySelector('i');
+                if (data.status === 'added') {
+                    icon.className = 'fas fa-heart';
+                    icon.style.color = '#dc2626';
+                    btn.style.borderColor = '#dc2626';
+                } else {
+                    icon.className = 'far fa-heart';
+                    icon.style.color = '#9ca3af';
+                    btn.style.borderColor = '#dddddd';
+                }
+            });
         }
     </script>
 @endsection

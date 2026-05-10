@@ -11,7 +11,7 @@
 
         .category-banner {
             width: 100%;
-            height: 315px;
+            height: auto !important;
             border-radius: 10px;
             overflow: hidden;
             position: relative;
@@ -309,13 +309,157 @@
             justify-content: center;
         }
 
+        .mobile-filter-bar {
+            display: none;
+        }
+
+        .filter-drawer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+        }
+
+        .filter-drawer-overlay.open {
+            display: block;
+        }
+
+        .filter-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            z-index: 9999;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .filter-drawer.open {
+            transform: translateY(0);
+        }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #dddddd;
+            border-radius: 50px;
+            margin: 0 auto 16px;
+        }
+
+        .drawer-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2a2a2a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drawer-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #9ca3af;
+            cursor: pointer;
+        }
+
         @media (max-width: 1024px) {
             .main-layout {
                 grid-template-columns: 1fr;
             }
 
             .filter-sidebar {
+                display: none;
+                /* hide sidebar on mobile */
                 position: static;
+            }
+
+            .mobile-filter-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .mobile-filter-btn {
+                flex: 1;
+                padding: 10px;
+                background: #2a2a2a;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                font-family: 'Poppins', sans-serif;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .mobile-sort-wrap {
+                flex: 1;
+            }
+
+            .mobile-sort-wrap select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #dddddd;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                font-family: 'Poppins', sans-serif;
+                outline: none;
+                cursor: pointer;
+                background: #fff;
+            }
+
+            /* hide sort from items-found-bar on mobile */
+            .items-found-bar .flex {
+                display: none;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .product-top-section {
+                height: 160px;
+            }
+
+            .sale-price {
+                font-size: 1rem;
+            }
+
+            .old-price {
+                font-size: 0.7rem;
+            }
+
+            .product-name {
+                font-size: 0.8rem;
+            }
+
+            .category-banner {
+                width: 100%;
+                height: auto !important;
+                border-radius: 5px;
+                margin: 20px 0 0px;
+            }
+
+            .main-title {
+                font-size: 1.4rem;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -337,6 +481,72 @@
 
         {{-- MAIN TITLE --}}
         <h1 class="main-title">{{ $category->name }} Price in Bangladesh</h1>
+
+        {{-- ── Mobile Filter Bar (OUTSIDE the form) ── --}}
+        <div class="mobile-filter-bar">
+            <button type="button" class="mobile-filter-btn" onclick="openFilterDrawer()">
+                <i class="fas fa-sliders-h"></i> Filter
+            </button>
+            <div class="mobile-sort-wrap">
+                <form method="GET" action="{{ url()->current() }}" id="mobile-sort-form">
+                    @foreach (request()->except('sort') as $key => $val)
+                        @if (is_array($val))
+                            @foreach ($val as $v)
+                                <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $val }}">
+                        @endif
+                    @endforeach
+                    <select name="sort" onchange="document.getElementById('mobile-sort-form').submit()">
+                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
+                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
+                            High</option>
+                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to
+                            Low</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        {{-- ── Filter Drawer Overlay (OUTSIDE the form) ── --}}
+        <div class="filter-drawer-overlay" id="drawer-overlay" onclick="closeFilterDrawer()"></div>
+
+        {{-- ── Filter Drawer (OUTSIDE the form) ── --}}
+        <div class="filter-drawer" id="filter-drawer">
+            <div class="drawer-handle"></div>
+            <div class="drawer-title">
+                <i class="fas fa-filter"></i> Filters
+                <button class="drawer-close" onclick="closeFilterDrawer()">✕</button>
+            </div>
+            <form method="GET" action="{{ url()->current() }}">
+                <div class="filter-group">
+                    <span class="filter-label">Filter by price</span>
+                    <div class="price-inputs">
+                        <input type="number" name="min_price" class="price-input" placeholder="Min"
+                            value="{{ request('min_price') }}">
+                        <input type="number" name="max_price" class="price-input" placeholder="Max"
+                            value="{{ request('max_price') }}">
+                    </div>
+                    <button type="submit" class="apply-btn">Apply</button>
+                </div>
+                <div class="filter-group" style="border:none">
+                    <span class="filter-label">By Brand</span>
+                    <div class="brand-list">
+                        @foreach ($brands as $brandId)
+                            @php $brand = \App\Models\Brand::find($brandId); @endphp
+                            <label class="brand-item">
+                                <input type="checkbox" name="brands[]" value="{{ $brandId }}"
+                                    {{ in_array($brandId, request('brands', [])) ? 'checked' : '' }}
+                                    onchange="this.form.submit()">
+                                {{ $brand->name ?? 'Unknown Brand' }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </form>
+        </div>
+
 
         {{-- FORM --}}
         <form method="GET" action="{{ url()->current() }}">
@@ -387,7 +597,8 @@
                             <span class="text-sm text-gray-500">Sort By:</span>
                             <select name="sort" class="sort-dropdown" onchange="this.form.submit()">
                                 <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
-                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low
+                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price:
+                                    Low
                                     to High</option>
                                 <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price:
                                     High to Low</option>
@@ -553,6 +764,18 @@
                         btn.style.borderColor = '#dddddd';
                     }
                 });
+        }
+
+        function openFilterDrawer() {
+            document.getElementById('filter-drawer').classList.add('open');
+            document.getElementById('drawer-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFilterDrawer() {
+            document.getElementById('filter-drawer').classList.remove('open');
+            document.getElementById('drawer-overlay').classList.remove('open');
+            document.body.style.overflow = '';
         }
     </script>
 @endsection

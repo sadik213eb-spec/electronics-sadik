@@ -12,13 +12,13 @@
         }
 
         .slider-wrap {
-            flex: 0 0 65%;
-            max-width: 65%;
+            flex: 0 0 66.7%;
+            max-width: 66.7%;
         }
 
         .banner-wrap {
-            flex: 0 0 calc(35% - 12px);
-            max-width: calc(35% - 12px);
+            flex: 0 0 calc(33.3% - 12px);
+            max-width: calc(33.3% - 12px);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -30,7 +30,7 @@
 
         .banner-wrap a img {
             width: 100%;
-            height: 199px;
+            height: auto;
             object-fit: cover;
             border-radius: 12px;
             display: block;
@@ -399,19 +399,19 @@
 
         {{-- SLIDER --}}
         <div class="slider-wrap">
-            <div class="swiper mySwiper" style="border-radius:12px; overflow:hidden; height:410px; width:100%;">
+            <div class="swiper mySwiper" style="border-radius:12px; overflow:hidden; height:auto; width:100%;">
                 <div class="swiper-wrapper">
                     @forelse($sliders as $slider)
                         <div class="swiper-slide">
                             <a href="{{ $slider->link ?? '#' }}">
                                 <img src="{{ asset('storage/' . $slider->image) }}"
-                                    style="width:100%; height:410px; object-fit:cover;">
+                                    style="width:100%; height:auto; object-fit:cover;">
                             </a>
                         </div>
                     @empty
                         <div class="swiper-slide">
                             <div
-                                style="width:100%; height:410; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
+                                style="width:100%; height:auto; background:#1a1a1a; display:flex; align-items:center; justify-content:center;">
                                 <p style="color:#6b7280;">No sliders available</p>
                             </div>
                         </div>
@@ -446,7 +446,7 @@
                     @foreach ($section->items as $item)
                         <a href="{{ $item->link ?? '#' }}" style="{{ $itemCount === 1 ? 'display:block;' : 'flex:1;' }}">
                             <img src="{{ asset('storage/' . $item->image) }}" alt="Banner"
-                                style="width:100%; height:{{ $itemCount === 1 ? '160px' : '300px' }}; object-fit:cover; border-radius:10px; {{ $itemCount === 1 ? 'max-width:1260px; display:block; margin:0 auto;' : '' }}">
+                                style="width:100%; height:{{ $itemCount === 1 ? 'auto' : 'auto' }}; object-fit:cover; border-radius:10px; {{ $itemCount === 1 ? 'max-width:1260px; display:block; margin:0 auto;' : '' }}">
                         </a>
                     @endforeach
                 </div>

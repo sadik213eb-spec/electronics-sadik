@@ -345,6 +345,25 @@
         @media (max-width: 1024px) {
             .account-wrapper {
                 grid-template-columns: 1fr;
+                padding: 0 12px;
+                margin: 16px auto;
+                gap: 16px;
+            }
+
+            .account-content {
+                padding: 16px;
+                overflow-x: hidden;
+                min-width: 0;
+                /* critical: prevents grid blowout */
+            }
+
+            .account-sidebar {
+                padding: 16px;
+            }
+
+            .order-row {
+                flex-wrap: wrap;
+                gap: 8px;
             }
         }
 
@@ -359,6 +378,16 @@
 
             .form-group.full {
                 grid-column: span 1;
+            }
+
+            .info-section {
+                padding: 14px;
+            }
+
+            .edit-btn {
+                position: static;
+                display: block;
+                margin-bottom: 12px;
             }
         }
     </style>

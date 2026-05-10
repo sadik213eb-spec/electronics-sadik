@@ -197,8 +197,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
+            border-bottom: 1px solid red;
+            padding-bottom: 15px;
+        }
+
+        .order-btn-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 80%;
         }
 
         .qty-controls {
@@ -518,6 +528,44 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+
+            /* RIGHT: INFO */
+            .product-title {
+                font-size: 1.25rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+                line-height: 1.3;
+            }
+
+            .qty-controls {
+                width: 124px !important;
+            }
+
+            .order-btn-control {
+                width: 100%;
+            }
+
+            .related-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .related-card img {
+                height: 150px;
+            }
+
+            .related-card-name {
+                font-size: 0.8rem;
+            }
+
+            .related-card-price {
+                font-size: 1rem;
+            }
+
+            .related-card-old {
+                font-size: 0.75rem;
+            }
         }
     </style>
 
@@ -651,12 +699,14 @@
                     <input type="number" id="quantity" class="qty-input" value="1" min="1">
                     <button class="qty-btn" onclick="changeQty(1)">+</button>
                 </div>
-                <button class="btn-cart" onclick="addToCart({{ $product->id }})">
-                    🛒 Add To Cart
-                </button>
-                <button class="btn-buy" onclick="buyNow({{ $product->id }})">
-                    ⚡ Buy Now
-                </button>
+                <div class="order-btn-control">
+                    <button class="btn-cart" onclick="addToCart({{ $product->id }})">
+                        🛒 Add To Cart
+                    </button>
+                    <button class="btn-buy" onclick="buyNow({{ $product->id }})">
+                        ⚡ Buy Now
+                    </button>
+                </div>
             </div>
 
             {{-- Share --}}
@@ -1053,6 +1103,20 @@
                             flex-direction: column;
                             gap: 16px;
                         }
+
+                        .rating-bars {
+                            width: 100%;
+                        }
+
+                        .rating-bar-row {
+                            width: 100%;
+                        }
+
+                        .bar-track {
+                            flex: 1;
+                            min-width: 0;
+                            width: 100%;
+                        }
                     }
                 </style>
 
@@ -1154,9 +1218,7 @@
                 </div>
             </div>
 
-            {{-- ══════════════════════════════════════
-     REVIEW MODAL — outside tab-content div
-     ══════════════════════════════════════ --}}
+            {{-- ══════════════════════════════════════ REVIEW MODAL — outside tab-content div  ══════════════════════════════════════ --}}
             <div id="review-modal" class="review-modal-overlay"
                 onclick="if(event.target===this) this.classList.remove('open')">
                 <div class="review-modal-box">
