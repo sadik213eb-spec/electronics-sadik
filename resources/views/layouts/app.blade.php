@@ -272,7 +272,7 @@
                 {{-- Mobile Logo --}}
                 <a href="/" style="position:absolute; left:50%; transform:translateX(-50%);">
                     <img src="{{ asset('storage/media/wholesale-electronics-tm-1-768x63png-removebg-preview.png') }}"
-                        alt="Wholesale Electronics" style="height:32px; width:auto;">
+                        alt="Wholesale Electronics" style="height:auto; width:auto;">
                 </a>
 
                 {{-- Mobile Cart --}}

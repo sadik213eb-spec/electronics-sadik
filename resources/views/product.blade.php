@@ -589,7 +589,8 @@
                 </span>
                 <span class="rating-count">
                     @if ($reviewCount > 0)
-                        {{ number_format($averageRating, 1) }} ({{ $reviewCount }}
+                        {{-- {{ number_format($averageRating, 1) }}  --}}
+                        ({{ $reviewCount }}
                         {{ $reviewCount == 1 ? 'Review' : 'Reviews' }})
                     @else
                         No Reviews

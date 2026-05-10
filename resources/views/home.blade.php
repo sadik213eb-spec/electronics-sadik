@@ -68,7 +68,7 @@
         .section-title {
             font-size: 1.6rem;
             font-weight: 600;
-            color: #000000;
+            color: #2a2a2a;
             font-family: 'Montserrat', sans-serif;
         }
 
@@ -241,47 +241,155 @@
 
         .image-section a img {
             width: 100%;
-            height: 299%px;
+            height: 299px;
             object-fit: cover;
             border-radius: 12px;
         }
 
         /* Mobile */
-        @media (max-width: 768px) {
-            .hero-section {
-                flex-direction: column;
+        @media (max-width: 410px) {
+
+            .section-title {
+                font-size: 1.5rem;
+                font-weight: 700;
             }
 
-            .slider-wrap,
+            .view-all {
+                font-size: 0.8rem;
+                font-weight: 500;
+                padding: 5px 14px;
+                border-radius: 3px;
+            }
+
+            .view-all:hover {
+                transform: translateY(-3px);
+            }
+
+            .hero-section {
+                gap: 7px;
+                flex-direction: column;
+                margin: 10px auto;
+                padding: 0 20px;
+            }
+
+            .slider-wrap {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .swiper.mySwiper.swiper-initialized.swiper-horizontal.swiper-backface-hidden {
+                height: auto !important;
+                border-radius: 5px !important;
+            }
+
+            .swiper-slide>a>img {
+                width: 100%;
+                height: auto !important;
+            }
+
             .banner-wrap {
                 flex: 0 0 100%;
-                width: 100%;
+                max-width: 100%;
+                display: flex;
+                flex-direction: row;
+                gap: 7px;
             }
 
-            .banner-wrap {
-                flex-direction: row;
+            .banner-wrap a {
+                display: block;
             }
 
             .banner-wrap a img {
-                height: 120px;
+                width: 100%;
+                height: auto !important;
+                object-fit: cover;
+                border-radius: 5px;
+                display: block;
             }
+
 
             .products-row {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .product-card {
+                border-radius: 5px;
+            }
+
+            .product-img-wrap {
+                width: 100%;
+                height: 150px;
+                margin-bottom: 10px;
+            }
+
+            .product-name {
+                font-size: 0.7rem;
+                font-weight: 600;
+                margin-bottom: 7px;
+                height: 32px;
+                line-height: 1.4;
+            }
+
+            .price-row {
+                gap: 5px;
+                margin-bottom: 5px;
+            }
+
+            .sale-price {
+                font-size: 1.1rem;
+            }
+
+            .old-price {
+                font-size: 0.75rem;
+            }
+
+            .rating-stars {
+                font-size: 0.7rem;
+            }
+
+            .rating-count {
+                color: #9ca3af;
+                font-size: 0.7rem;
             }
 
             .categories-row {
                 grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+            }
+
+            .category-card {
+                border-radius: 5px;
+                padding: 7px;
+
+            }
+
+            .category-card img {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 10px;
+                border-radius: 0px;
+            }
+
+            .category-card p {
+                font-size: 0.7rem;
             }
 
             .image-section {
                 flex-direction: column;
             }
-        }
 
-        @media (max-width: 480px) {
-            .banner-wrap {
-                flex-direction: column;
+            .image-section a img {
+                width: 100% !important;
+                object-fit: contain !important;
+                border-radius: 10px;
+                display: block;
+                height: auto !important;
+            }
+
+            .home-section .image-section {
+                margin-top: -30px !important;
+                margin-bottom: -15px !important;
             }
         }
     </style>
