@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Web Manage')
                     ->sort(1),
             ])
+            ->favicon(asset('storage/media/cropped-android-chrome-512x512-2-32x32.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->resources([
                 BrandResource::class,

@@ -12,7 +12,7 @@
         /* Banner */
         .offer-banner {
             width: 100%;
-            height: 315px;
+            height: auto !important;
             border-radius: 10px;
             overflow: hidden;
             margin: 30px 0 20px;
@@ -200,7 +200,7 @@
         }
 
         .product-name {
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 500;
             color: #2a2a2a;
             margin-bottom: 5px;
@@ -210,7 +210,7 @@
             overflow: hidden;
             line-height: 1.4;
             text-decoration: none;
-            height: 35px;
+            height: 40px;
         }
 
         .action-row {
@@ -297,6 +297,33 @@
 
             .countdown-box .num {
                 font-size: 1.2rem;
+            }
+
+            .offer-banner {
+                border-radius: 5px;
+                margin: 20px 0 10px;
+            }
+
+            .breadcrumb {
+                font-size: 0.8rem;
+            }
+
+            .offer-title {
+                font-size: 1.5rem;
+            }
+
+            .countdown-box .num {
+                font-size: 1.2rem;
+            }
+
+            .countdown-sep {
+                font-size: 1.2rem;
+            }
+
+            .product-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
         }
     </style>
