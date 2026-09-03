@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductBanner;
@@ -55,7 +56,6 @@ class ProductController extends Controller
         $allCategoryIds = $childCategoryIds->push($category->id);
 
         // 3. Calculate Min and Max price for the description text
-        // We use a CASE statement to pick sale_price if it exists, otherwise price
         $minPrice = Product::whereIn('category_id', $allCategoryIds)
             ->where('status', 'active')
             ->min(DB::raw('(CASE WHEN sale_price IS NOT NULL THEN sale_price ELSE price END)'));
@@ -118,7 +118,42 @@ class ProductController extends Controller
     }
 
     /**
-     * Helper method to avoid repeating filter logic in both category and childCategory
+     * Display all products for a given brand, across every category.
+     * URL: /brand/{brand}  (route model bound by Brand's route key, e.g. id or slug)
+     */
+    public function brand(Request $request, Brand $brand)
+    {
+        $minPrice = Product::where('brand_id', $brand->id)
+            ->where('status', 'active')
+            ->min(DB::raw('(CASE WHEN sale_price IS NOT NULL THEN sale_price ELSE price END)'));
+
+        $maxPrice = Product::where('brand_id', $brand->id)
+            ->where('status', 'active')
+            ->max(DB::raw('(CASE WHEN sale_price IS NOT NULL THEN sale_price ELSE price END)'));
+
+        $query = Product::where('brand_id', $brand->id)->where('status', 'active');
+
+        $this->applyFilters($query, $request);
+
+        $products = $query->paginate(12)->withQueryString();
+
+        $brands = Product::where('brand_id', $brand->id)
+            ->distinct()
+            ->pluck('brand_id');
+
+        // Reuse the existing category view — pass a lightweight stand-in
+        // object so the view's $category->name / breadcrumb code still works.
+        $category = (object) [
+            'name' => $brand->name,
+            'banner' => null,
+        ];
+        $breadcrumbMiddle = 'brand';
+
+        return view('category', compact('category', 'products', 'brands', 'minPrice', 'maxPrice', 'breadcrumbMiddle'));
+    }
+
+    /**
+     * Helper method to avoid repeating filter logic across listing methods
      */
     private function applyFilters($query, Request $request)
     {

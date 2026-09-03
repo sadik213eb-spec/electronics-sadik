@@ -303,7 +303,7 @@
     <div class="account-wrapper">
 
         {{-- SIDEBAR --}}
-        <div class="account-sidebar">
+        {{-- <div class="account-sidebar">
             <div class="sidebar-profile">
                 <div class="profile-avatar">
                     @if ($customer->profile_photo)
@@ -343,7 +343,9 @@
                     </form>
                 </li>
             </ul>
-        </div>
+        </div> --}}
+
+        @include('account.partials._sidebar')
 
         {{-- CONTENT --}}
         <div class="account-content">

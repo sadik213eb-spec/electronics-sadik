@@ -394,7 +394,7 @@
 
     <div class="account-wrapper">
 
-        {{-- SIDEBAR --}}
+        {{-- SIDEBAR
         <div class="account-sidebar">
             <div class="sidebar-profile">
                 <div class="profile-avatar">
@@ -406,6 +406,9 @@
                 </div>
                 <p class="profile-name">{{ $customer->name }}</p>
                 <p class="profile-email">{{ $customer->email }}</p>
+                <div class="profile-reward-points">
+                    <i class="fas fa-trophy"></i> {{ number_format($customer->totalRewardPoints()) }} Reward Points
+                </div>
             </div>
 
             <ul class="sidebar-menu">
@@ -418,6 +421,13 @@
                 <li>
                     <a href="/account/orders" class="{{ request()->is('account/orders') ? 'active' : '' }}">
                         <i class="fas fa-box"></i> My Orders
+                        <span class="arrow">›</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('account.reward-points') }}"
+                        class="{{ request()->is('account/reward-points') ? 'active' : '' }}">
+                        <i class="fas fa-gift"></i> Reward Points
                         <span class="arrow">›</span>
                     </a>
                 </li>
@@ -464,7 +474,9 @@
                     </form>
                 </li>
             </ul>
-        </div>
+        </div> --}}
+
+        @include('account.partials._sidebar')
 
         {{-- CONTENT --}}
         <div class="account-content">
@@ -514,18 +526,15 @@
 
                             <div class="form-group">
                                 <label class="form-label">Full Name</label>
-                                <input type="text" name="name" class="form-input" value="{{ $customer->name }}"
-                                    required>
+                                <input type="text" name="name" class="form-input" value="{{ $customer->name }}" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Mobile Number</label>
-                                <input type="tel" name="mobile" class="form-input" value="{{ $customer->mobile }}"
-                                    required>
+                                <input type="tel" name="mobile" class="form-input" value="{{ $customer->mobile }}" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-input" value="{{ $customer->email }}"
-                                    required>
+                                <input type="email" name="email" class="form-input" value="{{ $customer->email }}" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Birthday</label>
@@ -577,8 +586,7 @@
                                 </div>
                             </div>
                             <button type="submit" class="save-btn">Update Password</button>
-                            <button type="button" class="cancel-btn"
-                                onclick="toggleEdit('password-form')">Cancel</button>
+                            <button type="button" class="cancel-btn" onclick="toggleEdit('password-form')">Cancel</button>
                         </form>
                     </div>
                 </div>
@@ -614,4 +622,4 @@
             }
         </script>
 
-    @endsection
+@endsection

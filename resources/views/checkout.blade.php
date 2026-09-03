@@ -485,12 +485,12 @@
                                 <button type="button"
                                     class="address-card {{ $defaultAddress && $defaultAddress->id === $addr->id ? 'active' : '' }}"
                                     onclick="fillAddress(
-                                                                        this,
-                                                                        '{{ addslashes($addr->name) }}',
-                                                                        '{{ addslashes($addr->mobile) }}',
-                                                                        '{{ addslashes($addr->address) }}',
-                                                                        '{{ addslashes($addr->city) }}'
-                                                                    )">
+                                                                                                                                                                                                                                                                                                                                                    this,
+                                                                                                                                                                                                                                                                                                                                                    '{{ addslashes($addr->name) }}',
+                                                                                                                                                                                                                                                                                                                                                    '{{ addslashes($addr->mobile) }}',
+                                                                                                                                                                                                                                                                                                                                                    '{{ addslashes($addr->address) }}',
+                                                                                                                                                                                                                                                                                                                                                    '{{ addslashes($addr->city) }}'
+                                                                                                                                                                                                                                                                                                                                                )">
                                     <div class="address-card-type">
                                         {{ $typeIcons[$addr->type] ?? '📍' }} {{ ucfirst($addr->type) }}
                                     </div>
@@ -500,7 +500,8 @@
                             @endforeach
 
                             {{-- Option to use a different address --}}
-                            <button type="button" class="address-card" onclick="clearAddress(this)" style="border-style: dashed;">
+                            <button type="button" class="address-card" onclick="clearAddress(this)"
+                                style="border-style: dashed;">
                                 <div class="address-card-type">➕ New</div>
                                 <div class="address-card-name">Different</div>
                                 <div class="address-card-city">address</div>
@@ -616,13 +617,56 @@
         <div class="checkout-right">
             <h3 class="summary-title">Order Summary</h3>
 
-            <div class="discount-section">
+            {{-- <div class="discount-section">
                 <div class="discount-input-row">
                     <input type="text" id="discount_code" class="discount-input" placeholder="Enter discount code">
                     <button class="apply-btn" onclick="applyDiscount()">Apply</button>
                 </div>
                 <p id="discount-msg" style="font-size:0.8rem; margin-top:6px;"></p>
+            </div> --}}
+
+            <div class="discount-section">
+                <div id="coupon-applied-view" style="{{ $coupon ? '' : 'display:none;' }}">
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 14px;">
+                        <span style="font-size:0.88rem; color:#16a34a; font-weight:600;">
+                            ✅ Coupon "<span id="applied-coupon-code">{{ $coupon['code'] ?? '' }}</span>" applied
+                        </span>
+                        <button type="button" onclick="removeCoupon()"
+                            style="background:none; border:none; color:#dc2626; font-size:0.82rem; font-weight:600; cursor:pointer;">Remove</button>
+                    </div>
+                </div>
+                <div id="coupon-input-view" style="{{ $coupon ? 'display:none;' : '' }}">
+                    <div class="discount-input-row">
+                        <input type="text" id="discount_code" class="discount-input"
+                            placeholder="Enter discount code">
+                        <button type="button" class="apply-btn" onclick="applyDiscount()">Apply</button>
+                    </div>
+                </div>
+                <p id="discount-msg" style="font-size:0.8rem; margin-top:6px;"></p>
             </div>
+
+            @auth('customer')
+                @if ($availablePoints > 0)
+                    <div class="discount-section" id="reward-points-section">
+                        <label
+                            style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#2a2a2a; cursor:pointer; margin-bottom:8px;">
+                            <input type="checkbox" id="use_points_checkbox" onchange="toggleRewardPointsInput(this)">
+                            Use Reward Points ({{ number_format($availablePoints) }} available, up to
+                            ৳{{ number_format($maxPointsDiscount, 2) }} off)
+                        </label>
+
+                        <div id="points-input-row" style="display:none; gap:8px; align-items:center;">
+                            <input type="number" id="points_input" class="discount-input" min="0"
+                                max="{{ $availablePoints }}" step="1" placeholder="Enter points to use"
+                                oninput="updatePointsDiscount()">
+                            <button type="button" class="apply-btn" onclick="updatePointsDiscount()">Apply</button>
+                        </div>
+                        <p id="points-msg" style="font-size:0.8rem; margin-top:6px;"></p>
+                    </div>
+                @endif
+            @endauth
+            <input type="hidden" name="points_to_redeem" id="points_to_redeem" value="0" form="checkout-form">
 
             <div class="order-items">
                 @foreach ($items as $item)
@@ -653,16 +697,26 @@
             <div class="summary-row">
                 <span class="label">
                     Discount:
-                    @if($coupon)
+                    @if ($coupon && $discount >= $autoDiscount)
                         <span
                             style="font-size:0.75rem; background:#dcfce7; color:#16a34a; padding:2px 8px; border-radius:50px; margin-left:4px;">
                             {{ $coupon['code'] }}
                         </span>
+                    @elseif($autoDiscount > 0)
+                        <span
+                            style="font-size:0.75rem; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:50px; margin-left:4px;">
+                            Special Offer
+                        </span>
                     @endif
                 </span>
-                <span class="value" id="checkout-discount" style="{{ $discount > 0 ? 'color:#16a34a;' : '' }}">
-                    {{ $discount > 0 ? '- ৳' . number_format($discount) : '৳ 0' }}
+                <span class="value" id="checkout-discount" style="{{ $productDiscount > 0 ? 'color:#16a34a;' : '' }}">
+                    {{ $productDiscount > 0 ? '- ৳' . number_format($productDiscount) : '৳ 0' }}
                 </span>
+            </div>
+
+            <div class="summary-row" id="points-discount-row" style="display:none;">
+                <span class="label">Reward Points:</span>
+                <span class="value" id="checkout-points-discount" style="color:#16a34a;">- ৳0</span>
             </div>
 
             <div class="summary-row">
@@ -689,18 +743,24 @@
 
     <script>
         const subtotal = {{ $subtotal }};
-        const discount = {{ $discount ?? 0 }};
+        const discount = {{ $productDiscount ?? 0 }};
+        const availablePoints = {{ $availablePoints ?? 0 }};
+        const maxPointsDiscount = {{ $maxPointsDiscount ?? 0 }};
+        const pointsRate = 0.03; // 100 points = ৳3
+        const maxRedeemablePoints = Math.min(availablePoints, Math.floor(maxPointsDiscount / pointsRate));
+        let pointsDiscount = 0;
         const shippingPrices = {
             inside_dhaka: {{ $items->max(fn($i) => $i->product->shipping_inside_dhaka ?? 60) }},
             outside_dhaka: {{ $items->max(fn($i) => $i->product->shipping_outside_dhaka ?? 120) }}
-         };
+        };
         let currentShipping = shippingPrices.inside_dhaka;
 
         // Init shipping display
         document.getElementById('price-inside').textContent = '৳' + shippingPrices.inside_dhaka;
         document.getElementById('price-outside').textContent = '৳' + shippingPrices.outside_dhaka;
         document.getElementById('checkout-shipping').textContent = '৳' + currentShipping.toLocaleString('en-IN');
-        document.getElementById('checkout-total').textContent = '৳' + Math.max(0, subtotal + currentShipping - discount).toLocaleString('en-IN');
+        document.getElementById('checkout-total').textContent = '৳' + Math.max(0, subtotal + currentShipping - discount)
+            .toLocaleString('en-IN');
         // ✅ Fill shipping fields from saved address card
         function fillAddress(btn, name, phone, address, city) {
             document.getElementById('shipping_name').value = name;
@@ -741,10 +801,51 @@
             el.querySelector('input').checked = true;
         }
 
+        function toggleRewardPointsInput(checkbox) {
+            const row = document.getElementById('points-input-row');
+            const msg = document.getElementById('points-msg');
+            if (checkbox.checked) {
+                row.style.display = 'flex';
+                document.getElementById('points_input').value = maxRedeemablePoints;
+                updatePointsDiscount();
+            } else {
+                row.style.display = 'none';
+                msg.textContent = '';
+                document.getElementById('points_input').value = '';
+                pointsDiscount = 0;
+                document.getElementById('points_to_redeem').value = 0;
+                document.getElementById('points-discount-row').style.display = 'none';
+                updateTotal();
+            }
+        }
+
+        function updatePointsDiscount() {
+            const input = document.getElementById('points_input');
+            const msg = document.getElementById('points-msg');
+            let points = parseInt(input.value, 10) || 0;
+
+            if (points < 0) points = 0;
+            if (points > maxRedeemablePoints) {
+                points = maxRedeemablePoints;
+                input.value = points;
+                msg.textContent = `Max ${maxRedeemablePoints} points can be used on this order.`;
+                msg.style.color = '#dc2626';
+            } else {
+                msg.textContent = '';
+            }
+
+            pointsDiscount = points * pointsRate;
+            document.getElementById('points_to_redeem').value = points;
+            document.getElementById('checkout-points-discount').textContent = '- ৳' + pointsDiscount.toFixed(2);
+            document.getElementById('points-discount-row').style.display = points > 0 ? 'flex' : 'none';
+
+            updateTotal();
+        }
+
         function updateTotal() {
-    const total = Math.max(0, subtotal + currentShipping - discount);
-    document.getElementById('checkout-total').textContent = '৳' + total.toLocaleString('en-IN');
-}
+            const total = Math.max(0, subtotal + currentShipping - discount - pointsDiscount);
+            document.getElementById('checkout-total').textContent = '৳' + total.toLocaleString('en-IN');
+        }
 
         function applyDiscount() {
             const code = document.getElementById('discount_code').value;
@@ -754,8 +855,46 @@
                 msg.style.color = '#dc2626';
                 return;
             }
-            msg.textContent = 'Invalid or expired discount code.';
-            msg.style.color = '#dc2626';
+
+            fetch('/cart/coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        coupon_code: code
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/checkout?just_applied=1';
+                    } else {
+                        msg.textContent = data.message;
+                        msg.style.color = '#dc2626';
+                    }
+                })
+                .catch(() => {
+                    msg.textContent = 'Something went wrong. Please try again.';
+                    msg.style.color = '#dc2626';
+                });
+        }
+
+        function removeCoupon() {
+            fetch('/cart/coupon', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/checkout';
+                    }
+                });
         }
     </script>
 

@@ -474,10 +474,13 @@
         @endif
 
         {{-- BREADCRUMB --}}
-        <div class="text-base text-gray-500 mb-2 mt-6">
-            <a href="/" class="hover:text-amber-600">Home</a> &rsaquo;
-            <span class="text-gray-800 font-medium">{{ $category->name }}</span>
-        </div>
+<div class="text-base text-gray-500 mb-2 mt-6">
+    <a href="/" class="hover:text-amber-600">Home</a> &rsaquo;
+    @if (!empty($breadcrumbMiddle))
+        <span class="text-gray-500">{{ $breadcrumbMiddle }}</span> &rsaquo;
+    @endif
+    <span class="text-gray-800 font-medium">{{ $category->name }}</span>
+</div>
 
         {{-- MAIN TITLE --}}
         <h1 class="main-title">{{ $category->name }} Price in Bangladesh</h1>

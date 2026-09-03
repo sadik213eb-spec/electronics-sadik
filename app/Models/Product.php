@@ -11,6 +11,7 @@ class Product extends Model
         'slug',
         'category_id',
         'brand_id',
+        'sold_by',
         'price',
         'sale_price',
         'stock',
@@ -56,4 +57,33 @@ class Product extends Model
     {
         return $this->reviews()->avg('rating');
     }
+
+    /**
+     * Reward points earned when purchasing this product.
+     * Calculated as a percentage of the effective (sale) price.
+     */
+    public function rewardPoints(): int
+    {
+        $price = $this->sale_price ?? $this->price;
+        $rate = 0.005; // 0.5% of price — adjust as needed
+
+        return (int) floor($price * $rate);
+    }
+    public function bestAutoDiscountPerUnit(): float
+    {
+        $price = $this->sale_price ?? $this->price;
+
+        $offers = \App\Models\CheckoutOffer::currentlyValid()->get();
+
+        $best = 0;
+
+        foreach ($offers as $offer) {
+            if ($offer->appliesToProduct($this->id)) {
+                $best = max($best, $offer->discountPerUnit($price));
+            }
+        }
+
+        return $best;
+    }
 }
+

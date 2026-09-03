@@ -13,6 +13,8 @@ class Order extends Model
         'shipping_cost',
         'shipping_zone',
         'discount_amount',
+        'points_redeemed',
+        'points_discount',
         'grand_total',
         'payment_status',
         'order_status',

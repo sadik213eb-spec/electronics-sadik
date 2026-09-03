@@ -65,6 +65,12 @@ class ProductResource extends Resource
                             ->relationship('brand', 'name')
                             ->required()
                             ->searchable(),
+
+                        TextInput::make('sold_by')
+                            ->label('Sold By')
+                            ->maxLength(255)
+                            ->placeholder('e.g. Haier Bangladesh'),
+
                     ])->columns(2),
 
                 // ---- PRICING & INVENTORY ----
@@ -89,7 +95,7 @@ class ProductResource extends Resource
                                     return function (string $attribute, $value, \Closure $fail) use ($get) {
                                         $mrp = floatval($get('price') ?? 0);
                                         if ($value !== null && $value !== '' && floatval($value) > $mrp) {
-                                            $fail('Sale price must be less than or equal to the regular price (৳'.number_format($mrp, 2).').');
+                                            $fail('Sale price must be less than or equal to the regular price (৳' . number_format($mrp, 2) . ').');
                                         }
                                     };
                                 },
@@ -177,6 +183,7 @@ class ProductResource extends Resource
                                 'bold',
                                 'bulletList',
                                 'codeBlock',
+                                'h1',
                                 'h2',
                                 'h3',
                                 'italic',
@@ -208,8 +215,8 @@ class ProductResource extends Resource
 
                         Select::make('status')
                             ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
+                                'active' => 'Published',
+                                'inactive' => 'Draft',
                             ])
                             ->default('active')
                             ->required(),
@@ -287,12 +294,12 @@ class ProductResource extends Resource
                 TextColumn::make('stock_status')
                     ->label('Stock Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'in_stock' => 'success',
                         'out_of_stock' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'in_stock' => 'In Stock',
                         'out_of_stock' => 'Out of Stock',
                         default => $state,

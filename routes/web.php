@@ -9,6 +9,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\RewardPointsController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\OfferController;
@@ -77,6 +78,9 @@ Route::get('/category/{slug}', [ProductController::class, 'category'])->name('ca
 
 // Child Category Page
 Route::get('/category/{parentSlug}/{childSlug}', [ProductController::class, 'childCategory'])->name('category.child.show');
+
+// Brand Page (all products for a brand, across categories)
+Route::get('/brand/{brand}', [ProductController::class, 'brand'])->name('brand.show');
 
 // ========== CART ==========
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -150,5 +154,5 @@ Route::middleware('auth:customer')->group(function () {
     Route::put('/account/profile', [AccountController::class, 'updateProfile'])->name('account.profile.update');
     Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
     Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('product.review.store');
-
+    Route::get('/account/reward-points', [RewardPointsController::class, 'index'])->name('account.reward-points');
 });
