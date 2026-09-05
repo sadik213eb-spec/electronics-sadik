@@ -31,6 +31,10 @@ return new class extends Migration {
             $table->decimal('shipping_outside_dhaka', 10, 2)->default(120.00)->after('shipping_inside_dhaka');
         });
 
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('image');
+        });
+
         Schema::table('sliders', function (Blueprint $table) {
             $table->string('name')->nullable()->after('id');
         });
@@ -50,6 +54,7 @@ return new class extends Migration {
         });
         Schema::table('products', function (Blueprint $table) {
             $table->dropColumn(['warranty', 'stock_status', 'images', 'shipping_inside_dhaka', 'shipping_outside_dhaka']);
+            $table->string('image')->nullable();
         });
         Schema::table('sliders', function (Blueprint $table) {
             $table->dropColumn('name');
