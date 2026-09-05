@@ -19,6 +19,7 @@ return new class extends Migration {
         });
 
         Schema::table('orders', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
             $table->dropColumn(['user_id', 'address']);
         });
 
@@ -44,6 +45,7 @@ return new class extends Migration {
         Schema::table('orders', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->nullable();
             $table->text('address')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->dropColumn(['customer_id', 'shipping_zone', 'grand_total', 'shipping_name', 'shipping_phone', 'shipping_address', 'shipping_city', 'shipping_zip']);
         });
         Schema::table('products', function (Blueprint $table) {
