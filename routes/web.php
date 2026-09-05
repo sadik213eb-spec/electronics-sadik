@@ -156,3 +156,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('product.review.store');
     Route::get('/account/reward-points', [RewardPointsController::class, 'index'])->name('account.reward-points');
 });
+
+Route::get('/test-random-page', function () {
+    return 'This works!';
+});
