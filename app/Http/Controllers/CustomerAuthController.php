@@ -66,6 +66,14 @@ class CustomerAuthController extends Controller
             'email' => 'Invalid email or password.',
         ])->withInput();
     }
+    public function showRegister()
+    {
+        if (Auth::guard('customer')->check()) {
+            return redirect('/account');
+        }
+
+        return view('auth.register');
+    }
 
     public function register(Request $request)
     {
@@ -98,4 +106,5 @@ class CustomerAuthController extends Controller
 
         return redirect('/login');
     }
+
 }
