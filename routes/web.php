@@ -112,11 +112,11 @@ Route::get('/admin/orders/{order}/invoice', [InvoiceController::class, 'show'])
 
 // ========== ADMIN PANEL REDIRECT ==========
 Route::get('/new-login', function () {
-    return redirect('/new-login/dashboard');
+    return redirect('/wep-admin-2026/dashboard');
 });
 
 // ========== MENU MANAGE ==========
-Route::middleware(['auth'])->prefix('new-login')->group(function () {
+Route::middleware(['auth'])->prefix('wep-admin-2026')->group(function () {
     Route::get('/menu-manage', [MenuController::class, 'index'])->name('admin.menu.index');
     Route::post('/menu-manage', [MenuController::class, 'store'])->name('admin.menu.store');
     Route::post('/menu-manage/reorder', [MenuController::class, 'reorder'])->name('admin.menu.reorder');

@@ -31,18 +31,18 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('new-login')
-            ->path('new-login')
+            ->id('wep-admin-2026')
+            ->path('wep-admin-2026')
             ->login()
             ->brandName('Wholesale Electronics')
             ->globalSearch(false)
-            ->homeUrl('/new-login/dashboard')
+            ->homeUrl('/wep-admin-2026/dashboard')
             ->colors([
                 'primary' => Color::Amber,
             ])
             ->navigationItems([
                 NavigationItem::make('Menu Manage')
-                    ->url('/new-login/menu-manage')
+                    ->url('/wep-admin-2026/menu-manage')
                     ->icon('heroicon-o-bars-3')
                     ->group('Web Manage')
                     ->sort(1),
