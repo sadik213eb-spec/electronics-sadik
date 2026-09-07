@@ -116,7 +116,7 @@ Route::get('/new-login', function () {
 });
 
 // ========== MENU MANAGE ==========
-Route::middleware(['auth'])->prefix('wep-admin-2026')->group(function () {
+Route::middleware(['auth'])->prefix('wep-panel-2026')->group(function () {
     Route::get('/menu-manage', [MenuController::class, 'index'])->name('admin.menu.index');
     Route::post('/menu-manage', [MenuController::class, 'store'])->name('admin.menu.store');
     Route::post('/menu-manage/reorder', [MenuController::class, 'reorder'])->name('admin.menu.reorder');
@@ -155,8 +155,4 @@ Route::middleware('auth:customer')->group(function () {
     Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
     Route::post('/products/{slug}/review', [ReviewController::class, 'store'])->name('product.review.store');
     Route::get('/account/reward-points', [RewardPointsController::class, 'index'])->name('account.reward-points');
-});
-
-Route::get('/test-random-page', function () {
-    return 'This works!';
 });
